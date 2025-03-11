@@ -252,71 +252,13 @@
             window.location.href = 'admin-login.html';
         }
 
-        // Logout function
-        function logout() {
-            localStorage.removeItem('adminLoggedIn');
-            window.location.href = 'admin-login.html';
-        }
-
-        // Load and display services
-        function loadServices() {
-            const defaultServices = [
-                { name: 'Classic Haircut', price: 150 },
-                { name: 'Beard Trim', price: 100 },
-                { name: 'Luxury Shave', price: 120 },
-                { name: 'Groom Makeup', price: 8000 }
-            ];
-
-            // Initialize services in localStorage if not present
-            if (!localStorage.getItem('services')) {
-                localStorage.setItem('services', JSON.stringify(defaultServices));
-            }
-
-            const services = JSON.parse(localStorage.getItem('services'));
-            const servicesList = document.getElementById('services-list');
-            servicesList.innerHTML = '';
-
-            services.forEach(service => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${service.name}</td>
-                    <td>₹${service.price}</td>
-                    <td><input type="number" class="price-input" value="${service.price}" min="0"></td>
-                    <td><button class="save-btn" onclick="updatePrice(this)">Save</button></td>
-                `;
-                servicesList.appendChild(row);
-            });
-        }
-
-        // Update service price
-        function updatePrice(button) {
-            const row = button.closest('tr');
-            const newPrice = parseInt(row.querySelector('.price-input').value);
-            const serviceName = row.cells[0].textContent;
-            
-            // Get current services from localStorage
-            let services = JSON.parse(localStorage.getItem('services'));
-            
-            // Update the price for the specific service
-            const serviceIndex = services.findIndex(s => s.name === serviceName);
-            if (serviceIndex !== -1) {
-                services[serviceIndex].price = newPrice;
-                localStorage.setItem('services', JSON.stringify(services));
-                
-                // Update display
-                row.cells[1].textContent = `₹${newPrice}`;
-                alert('Price updated successfully!');
-            }
-        }
-
         // Load and display bookings
         function loadBookings() {
             const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
             const bookingsList = document.getElementById('bookings-list');
             bookingsList.innerHTML = '';
 
-            // Sort bookings by date (most recent first)
-            bookings.sort((a, b) => new Date(b.date) - new Date(a.date));
+            bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
             bookings.forEach(booking => {
                 const row = document.createElement('tr');
@@ -324,13 +266,15 @@
                     <td>${booking.date} ${booking.time}</td>
                     <td>${booking.name}</td>
                     <td>${booking.service}</td>
-                    <td>${booking.phone}<br>${booking.email}</td>
-                    <td>${booking.status || 'Pending'}</td>
+                    <td>${booking.phone}</td>
+                    <td>${booking.status}</td>
                     <td>
-                        ${booking.status !== 'Confirmed' ? `<button class="action-btn confirm-btn" onclick="updateBookingStatus('${booking.id}', 'Confirmed')">Confirm</button>` : ''}
-                        ${booking.status === 'Confirmed' ? `<button class="action-btn complete-btn" onclick="updateBookingStatus('${booking.id}', 'Completed')">Complete</button>` : ''}
-                        ${booking.status === 'Pending' ? `<button class="action-btn cancel-btn" onclick="updateBookingStatus('${booking.id}', 'Cancelled')">Cancel</button>` : ''}
-                        <button class="action-btn delete-btn" onclick="deleteBooking('${booking.id}')">Delete</button>
+                        ${booking.status === 'pending' ? 
+                            `<button class="action-btn confirm-btn" onclick="updateBookingStatus(${booking.id}, 'confirmed')">Confirm</button>` : ''}
+                        ${booking.status === 'confirmed' ? 
+                            `<button class="action-btn complete-btn" onclick="updateBookingStatus(${booking.id}, 'completed')">Complete</button>` : ''}
+                        <button class="action-btn cancel-btn" onclick="updateBookingStatus(${booking.id}, 'cancelled')">Cancel</button>
+                        <button class="action-btn delete-btn" onclick="deleteBooking(${booking.id})">Delete</button>
                     </td>
                 `;
                 bookingsList.appendChild(row);
@@ -342,13 +286,13 @@
         // Update booking status
         function updateBookingStatus(bookingId, newStatus) {
             const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-            const bookingIndex = bookings.findIndex(b => b.id === parseInt(bookingId));
+            const bookingIndex = bookings.findIndex(b => b.id === bookingId);
             
             if (bookingIndex !== -1) {
                 bookings[bookingIndex].status = newStatus;
                 localStorage.setItem('bookings', JSON.stringify(bookings));
-                loadBookings(); // Refresh the bookings display
-                updateStatistics(); // Update the statistics
+                loadBookings();
+                updateStatistics();
             }
         }
 
@@ -359,6 +303,7 @@
                 const updatedBookings = bookings.filter(b => b.id !== bookingId);
                 localStorage.setItem('bookings', JSON.stringify(updatedBookings));
                 loadBookings();
+                updateStatistics();
             }
         }
 
@@ -368,17 +313,62 @@
             const today = new Date().toISOString().split('T')[0];
 
             document.getElementById('total-bookings').textContent = bookings.length;
-            document.getElementById('pending-bookings').textContent = bookings.filter(b => !b.status || b.status === 'Pending').length;
-            document.getElementById('confirmed-bookings').textContent = bookings.filter(b => b.status === 'Confirmed').length;
+            document.getElementById('pending-bookings').textContent = bookings.filter(b => b.status === 'pending').length;
+            document.getElementById('confirmed-bookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
             document.getElementById('today-bookings').textContent = bookings.filter(b => b.date === today).length;
         }
 
-        // Initial load
-        loadServices();
-        loadBookings();
+        // Load and display services
+        function loadServices() {
+            const defaultServices = [
+                { name: 'Classic Haircut', price: 150 },
+                { name: 'Beard Trim', price: 100 },
+                { name: 'Luxury Shave', price: 120 },
+                { name: 'Groom Makeup', price: 8000 }
+            ];
 
-        // Auto-refresh every minute
-        setInterval(loadBookings, 60000);
+            const services = JSON.parse(localStorage.getItem('services')) || defaultServices;
+            const servicesList = document.getElementById('services-list');
+            servicesList.innerHTML = '';
+
+            services.forEach(service => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${service.name}</td>
+                    <td>₹${service.price}</td>
+                    <td>
+                        <input type="number" class="price-input" value="${service.price}" min="0">
+                    </td>
+                    <td>
+                        <button class="save-btn" onclick="updatePrice('${service.name}', this)">Save</button>
+                    </td>
+                `;
+                servicesList.appendChild(row);
+            });
+        }
+
+        // Update service price
+        function updatePrice(serviceName, button) {
+            const newPrice = button.parentElement.previousElementSibling.querySelector('input').value;
+            const services = JSON.parse(localStorage.getItem('services')) || [];
+            const serviceIndex = services.findIndex(s => s.name === serviceName);
+            
+            if (serviceIndex !== -1) {
+                services[serviceIndex].price = parseInt(newPrice);
+                localStorage.setItem('services', JSON.stringify(services));
+                loadServices();
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Initialize dashboard
+        loadBookings();
+        loadServices();
     </script>
 </body>
 </html> 
