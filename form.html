@@ -155,6 +155,41 @@
         .resend-code[style*="pointer-events: none"] {
             cursor: default;
         }
+
+        /* Add these styles to your existing CSS */
+        .verify-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .verify-btn:hover {
+            background: #45a049;
+        }
+
+        .verification-code {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .verification-code {
+                justify-content: center;
+            }
+            
+            .verify-btn, .resend-code {
+                margin-top: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -203,6 +238,7 @@
                         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
                         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
                         <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <button type="button" onclick="verifyCode()" class="verify-btn">Verify</button>
                         <a class="resend-code" onclick="sendVerificationCode()">Resend Code</a>
                     </div>
                     <p id="verification-message"></p>
@@ -369,24 +405,26 @@
             messageElement.className = isSuccess ? 'success-message' : 'error-message';
         }
 
-        // Handle verification code input fields
+        // Update the verification code input handler
         const codeInputs = document.querySelectorAll('.verification-code input');
         codeInputs.forEach((input, index) => {
             input.addEventListener('keyup', (e) => {
                 if (e.key >= 0 && e.key <= 9) {
                     if (index < codeInputs.length - 1) {
                         codeInputs[index + 1].focus();
-                    } else {
-                        // If we're on the last input and a number was entered, verify the code
-                        const enteredCode = Array.from(codeInputs).map(input => input.value).join('');
-                        if (enteredCode.length === 4) {
-                            verifyCode();
-                        }
                     }
+                    // Remove automatic verification on last input
                 } else if (e.key === 'Backspace') {
                     if (index > 0) {
                         codeInputs[index - 1].focus();
                     }
+                }
+            });
+
+            // Add input event for mobile number input
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < codeInputs.length - 1) {
+                    codeInputs[index + 1].focus();
                 }
             });
         });
