@@ -267,8 +267,13 @@
             bookings.forEach(booking => {
                 console.log('Processing booking:', booking);
                 const row = document.createElement('tr');
+                
+                // Format the date for display (YYYY-MM-DD to DD-MM-YYYY)
+                const [year, month, day] = booking.date.split('-');
+                const displayDate = `${day}-${month}-${year}`;
+                
                 row.innerHTML = `
-                    <td>${booking.date} ${booking.time}</td>
+                    <td>${displayDate} ${booking.time}</td>
                     <td>${booking.name}</td>
                     <td>${booking.service}</td>
                     <td>${booking.phone}</td>
@@ -321,12 +326,13 @@
         // Update statistics
         function updateStatistics() {
             const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
             document.getElementById('total-bookings').textContent = bookings.length;
             document.getElementById('pending-bookings').textContent = bookings.filter(b => b.status === 'pending').length;
             document.getElementById('confirmed-bookings').textContent = bookings.filter(b => b.status === 'confirmed').length;
-            document.getElementById('today-bookings').textContent = bookings.filter(b => b.date === today).length;
+            document.getElementById('today-bookings').textContent = bookings.filter(b => b.date === formattedToday).length;
         }
 
         // Load and display services

@@ -475,17 +475,17 @@
                 const year = date.getFullYear();
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const day = String(date.getDate()).padStart(2, '0');
-                return `${day}-${month}-${year}`;
+                return `${year}-${month}-${day}`;
             };
 
             const todayOption = document.createElement('option');
-            todayOption.value = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
-            todayOption.textContent = formatDate(today);
+            todayOption.value = formatDate(today);
+            todayOption.textContent = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
             dateSelect.appendChild(todayOption);
 
             const tomorrowOption = document.createElement('option');
-            tomorrowOption.value = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate()).toISOString().split('T')[0];
-            tomorrowOption.textContent = formatDate(tomorrow);
+            tomorrowOption.value = formatDate(tomorrow);
+            tomorrowOption.textContent = `${String(tomorrow.getDate()).padStart(2, '0')}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${tomorrow.getFullYear()}`;
             dateSelect.appendChild(tomorrowOption);
 
             // Time input: Populate the dropdown with 15-minute intervals
@@ -567,6 +567,8 @@
                 const date = document.getElementById('date').value;
                 const phone = document.getElementById('phone').value;
                 
+                console.log('Form Data:', { name, service, time, date, phone });
+
                 // Create booking object
                 const booking = {
                     id: Date.now(),
@@ -581,25 +583,34 @@
                     emailVerified: true
                 };
                 
-                // Get existing bookings from localStorage or initialize empty array
-                const existingBookings = JSON.parse(localStorage.getItem('bookings')) || [];
-                
-                // Add new booking
-                existingBookings.push(booking);
-                
-                // Save back to localStorage
-                localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                
-                // Show success message
-                alert('Booking submitted successfully! We will contact you shortly.');
-                
-                // Reset form and verification state
-                bookingForm.reset();
-                verifiedEmail = '';
-                verificationCode = '';
-                document.getElementById('verification-container').classList.remove('active', 'verified');
-                Array.from(codeInputs).forEach(input => input.value = '');
-                document.getElementById('verification-message').textContent = '';
+                console.log('Booking Object:', booking);
+
+                try {
+                    // Get existing bookings from localStorage or initialize empty array
+                    const existingBookings = JSON.parse(localStorage.getItem('bookings')) || [];
+                    console.log('Existing Bookings:', existingBookings);
+                    
+                    // Add new booking
+                    existingBookings.push(booking);
+                    
+                    // Save back to localStorage
+                    localStorage.setItem('bookings', JSON.stringify(existingBookings));
+                    console.log('Booking saved successfully');
+                    
+                    // Show success message
+                    alert('Booking submitted successfully! We will contact you shortly.');
+                    
+                    // Reset form and verification state
+                    bookingForm.reset();
+                    verifiedEmail = '';
+                    verificationCode = '';
+                    document.getElementById('verification-container').classList.remove('active', 'verified');
+                    Array.from(codeInputs).forEach(input => input.value = '');
+                    document.getElementById('verification-message').textContent = '';
+                } catch (error) {
+                    console.error('Error saving booking:', error);
+                    alert('There was an error saving your booking. Please try again.');
+                }
             });
         });
     </script>
