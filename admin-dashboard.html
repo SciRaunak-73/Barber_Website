@@ -254,13 +254,18 @@
 
         // Load and display bookings
         function loadBookings() {
+            console.log('Loading bookings...');
             const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            console.log('Retrieved bookings:', bookings);
+            
             const bookingsList = document.getElementById('bookings-list');
             bookingsList.innerHTML = '';
 
             bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            console.log('Sorted bookings:', bookings);
 
             bookings.forEach(booking => {
+                console.log('Processing booking:', booking);
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${booking.date} ${booking.time}</td>
@@ -270,11 +275,11 @@
                     <td>${booking.status}</td>
                     <td>
                         ${booking.status === 'pending' ? 
-                            `<button class="action-btn confirm-btn" onclick="updateBookingStatus(${booking.id}, 'confirmed')">Confirm</button>` : ''}
+                            `<button class="action-btn confirm-btn" onclick="updateBookingStatus('${booking.id}', 'confirmed')">Confirm</button>` : ''}
                         ${booking.status === 'confirmed' ? 
-                            `<button class="action-btn complete-btn" onclick="updateBookingStatus(${booking.id}, 'completed')">Complete</button>` : ''}
-                        <button class="action-btn cancel-btn" onclick="updateBookingStatus(${booking.id}, 'cancelled')">Cancel</button>
-                        <button class="action-btn delete-btn" onclick="deleteBooking(${booking.id})">Delete</button>
+                            `<button class="action-btn complete-btn" onclick="updateBookingStatus('${booking.id}', 'completed')">Complete</button>` : ''}
+                        <button class="action-btn cancel-btn" onclick="updateBookingStatus('${booking.id}', 'cancelled')">Cancel</button>
+                        <button class="action-btn delete-btn" onclick="deleteBooking('${booking.id}')">Delete</button>
                     </td>
                 `;
                 bookingsList.appendChild(row);
@@ -285,23 +290,29 @@
 
         // Update booking status
         function updateBookingStatus(bookingId, newStatus) {
+            console.log('Updating booking status:', { bookingId, newStatus });
             const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-            const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+            const bookingIndex = bookings.findIndex(b => b.id.toString() === bookingId.toString());
             
             if (bookingIndex !== -1) {
                 bookings[bookingIndex].status = newStatus;
                 localStorage.setItem('bookings', JSON.stringify(bookings));
+                console.log('Booking status updated successfully');
                 loadBookings();
                 updateStatistics();
+            } else {
+                console.error('Booking not found:', bookingId);
             }
         }
 
         // Delete booking
         function deleteBooking(bookingId) {
             if (confirm('Are you sure you want to delete this booking?')) {
+                console.log('Deleting booking:', bookingId);
                 const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-                const updatedBookings = bookings.filter(b => b.id !== bookingId);
+                const updatedBookings = bookings.filter(b => b.id.toString() !== bookingId.toString());
                 localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+                console.log('Booking deleted successfully');
                 loadBookings();
                 updateStatistics();
             }
