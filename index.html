@@ -61,6 +61,12 @@
         </div>
     </footer>
     <script>
+        // Add toggle menu function
+        function toggleMenu() {
+            const menu = document.querySelector(".nav-links");
+            menu.classList.toggle("active");
+        }
+
         gsap.from("#animated-heading", {
             y: 50, 
             opacity: 0, 
