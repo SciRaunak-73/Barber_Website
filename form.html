@@ -11,7 +11,11 @@
     <script type="text/javascript">
         (function() {
             try {
-                emailjs.init("yBP8NKjJ7HmY9gAXP");
+                emailjs.init({
+                    publicKey: "yBP8NKjJ7HmY9gAXP",
+                    blockHeadless: false, // Optional: prevent usage in NodeJS environment
+                    limitRate: true // Optional: prevent spam
+                });
                 console.log("EmailJS initialized successfully");
             } catch (error) {
                 console.error("EmailJS initialization error:", error);
@@ -244,42 +248,53 @@
             }
 
             try {
+                // First, check if EmailJS is initialized
+                if (typeof emailjs === 'undefined') {
+                    throw new Error('EmailJS is not loaded properly');
+                }
+
                 verificationCode = generateVerificationCode();
                 console.log("Generated verification code:", verificationCode);
-                
+
+                // Create the template parameters
                 const templateParams = {
                     to_email: email,
                     verification_code: verificationCode,
                     to_name: document.getElementById('name').value || 'Customer',
-                    from_name: 'Roy Group Salon'
+                    from_name: 'Roy Group Salon',
+                    message: `Your verification code is: ${verificationCode}`
                 };
 
-                console.log("Sending email with params:", templateParams);
+                console.log("Attempting to send email with params:", templateParams);
                 document.getElementById('verification-container').classList.add('active');
                 showVerificationMessage('Sending verification code...', true);
 
-                console.log("Using EmailJS with:", {
-                    serviceId: 'service_3wlgfnk',
-                    templateId: 'template_k5u3nji',
-                    publicKey: 'yBP8NKjJ7HmY9gAXP'
-                });
-
+                // Use the correct EmailJS method
                 const response = await emailjs.send(
-                    'service_3wlgfnk',
-                    'template_k5u3nji',
-                    templateParams
+                    'service_3wlgfnk',  // Your EmailJS service ID
+                    'template_k5u3nji',  // Your EmailJS template ID
+                    templateParams,
+                    'yBP8NKjJ7HmY9gAXP'  // Your EmailJS public key
+                ).then(
+                    function(response) {
+                        console.log("SUCCESS!", response.status, response.text);
+                        showVerificationMessage('Verification code sent! Please check your email (including spam folder).', true);
+                    },
+                    function(error) {
+                        console.log("FAILED...", error);
+                        throw error;
+                    }
                 );
 
-                console.log("EmailJS response:", response);
-
-                if (response.status === 200) {
-                    showVerificationMessage('Verification code sent! Please check your email (including spam folder).', true);
-                } else {
-                    throw new Error('Failed to send email');
-                }
             } catch (error) {
-                console.error('Failed to send verification code:', error);
-                showVerificationMessage(`Failed to send verification code: ${error.message}`, false);
+                console.error('Detailed error:', error);
+                let errorMessage = 'Failed to send verification code. ';
+                if (error.text) {
+                    errorMessage += error.text;
+                } else if (error.message) {
+                    errorMessage += error.message;
+                }
+                showVerificationMessage(errorMessage, false);
             }
         }
 
