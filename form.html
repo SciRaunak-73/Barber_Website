@@ -147,6 +147,14 @@
             font-size: 14px;
             margin-left: 10px;
         }
+
+        /* Add CSS for the disabled resend button */
+        .resend-code {
+            transition: opacity 0.3s ease;
+        }
+        .resend-code[style*="pointer-events: none"] {
+            cursor: default;
+        }
     </style>
 </head>
 
@@ -230,6 +238,8 @@
     <script>
         let verificationCode = '';
         let verifiedEmail = '';
+        let canResendCode = true;
+        let resendTimer = null;
 
         function toggleMenu() {
             const menu = document.querySelector(".nav-links");
@@ -240,7 +250,39 @@
             return Math.floor(1000 + Math.random() * 9000).toString();
         }
 
+        function updateResendButton(seconds) {
+            const resendButton = document.querySelector('.resend-code');
+            if (seconds > 0) {
+                resendButton.style.pointerEvents = 'none';
+                resendButton.style.opacity = '0.5';
+                resendButton.textContent = `Resend Code (${seconds}s)`;
+            } else {
+                resendButton.style.pointerEvents = 'auto';
+                resendButton.style.opacity = '1';
+                resendButton.textContent = 'Resend Code';
+                canResendCode = true;
+            }
+        }
+
+        function startResendTimer() {
+            let seconds = 60;
+            canResendCode = false;
+            updateResendButton(seconds);
+
+            resendTimer = setInterval(() => {
+                seconds--;
+                updateResendButton(seconds);
+                if (seconds === 0) {
+                    clearInterval(resendTimer);
+                }
+            }, 1000);
+        }
+
         async function sendVerificationCode() {
+            if (!canResendCode) {
+                return;
+            }
+
             const email = document.getElementById('email').value;
             if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
                 showVerificationMessage('Please enter a valid email address', false);
@@ -262,19 +304,23 @@
                     verification_code: verificationCode,
                     to_name: document.getElementById('name').value || 'Customer',
                     from_name: 'Roy Group Salon',
-                    message: `Your verification code is: ${verificationCode}`
+                    message: `Your verification code is: ${verificationCode}`,
+                    reply_to: email
                 };
 
                 console.log("Attempting to send email with params:", templateParams);
                 document.getElementById('verification-container').classList.add('active');
                 showVerificationMessage('Sending verification code...', true);
 
+                // Start the resend timer
+                startResendTimer();
+
                 // Use the correct EmailJS method
                 const response = await emailjs.send(
-                    'service_3wlgfnk',  // Your EmailJS service ID
-                    'template_k5u3nji',  // Your EmailJS template ID
+                    'service_3wlgfnk',
+                    'template_k5u3nji',
                     templateParams,
-                    'yBP8NKjJ7HmY9gAXP'  // Your EmailJS public key
+                    'yBP8NKjJ7HmY9gAXP'
                 ).then(
                     function(response) {
                         console.log("SUCCESS!", response.status, response.text);
@@ -282,6 +328,10 @@
                     },
                     function(error) {
                         console.log("FAILED...", error);
+                        // Reset the timer if email sending fails
+                        clearInterval(resendTimer);
+                        canResendCode = true;
+                        updateResendButton(0);
                         throw error;
                     }
                 );
