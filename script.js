@@ -26,3 +26,15 @@ const navMenu = document.querySelector(".nav-menu");
 hamburger.addEventListener("click", () => {
   navMenu.classList.toggle("active");
 });
+
+// Gallery Animation
+document.addEventListener('DOMContentLoaded', function() {
+    const imageBoxes = document.querySelectorAll('.image-box');
+    
+    // Add settled class to each image box with a delay
+    imageBoxes.forEach((box, index) => {
+        setTimeout(() => {
+            box.classList.add('settled');
+        }, index * 500); // 500ms delay between each image
+    });
+});
