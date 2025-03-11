@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Now</title>
     <link rel="stylesheet" href="form.css">
+    <!-- Add EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            try {
+                emailjs.init("yBP8NKjJ7HmY9gAXP");
+                console.log("EmailJS initialized successfully");
+            } catch (error) {
+                console.error("EmailJS initialization error:", error);
+            }
+        })();
+    </script>
     <style>
         /* Hamburger Menu */
         .hamburger {
@@ -220,6 +232,78 @@
             menu.classList.toggle("active");
         }
 
+        function generateVerificationCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        async function sendVerificationCode() {
+            const email = document.getElementById('email').value;
+            if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                showVerificationMessage('Please enter a valid email address', false);
+                return;
+            }
+
+            try {
+                verificationCode = generateVerificationCode();
+                console.log("Generated verification code:", verificationCode);
+                
+                const templateParams = {
+                    to_email: email,
+                    verification_code: verificationCode,
+                    to_name: document.getElementById('name').value || 'Customer',
+                    from_name: 'Roy Group Salon'
+                };
+
+                console.log("Sending email with params:", templateParams);
+                document.getElementById('verification-container').classList.add('active');
+                showVerificationMessage('Sending verification code...', true);
+
+                console.log("Using EmailJS with:", {
+                    serviceId: 'service_3wlgfnk',
+                    templateId: 'template_k5u3nji',
+                    publicKey: 'yBP8NKjJ7HmY9gAXP'
+                });
+
+                const response = await emailjs.send(
+                    'service_3wlgfnk',
+                    'template_k5u3nji',
+                    templateParams
+                );
+
+                console.log("EmailJS response:", response);
+
+                if (response.status === 200) {
+                    showVerificationMessage('Verification code sent! Please check your email (including spam folder).', true);
+                } else {
+                    throw new Error('Failed to send email');
+                }
+            } catch (error) {
+                console.error('Failed to send verification code:', error);
+                showVerificationMessage(`Failed to send verification code: ${error.message}`, false);
+            }
+        }
+
+        function verifyCode() {
+            const enteredCode = Array.from(document.querySelectorAll('.verification-code input'))
+                .map(input => input.value)
+                .join('');
+            
+            if (enteredCode === verificationCode) {
+                verifiedEmail = document.getElementById('email').value;
+                showVerificationMessage('Email verified successfully!', true);
+                document.getElementById('verification-container').classList.add('verified');
+                document.getElementById('email').readOnly = true;
+            } else {
+                showVerificationMessage('Invalid code. Please try again.', false);
+            }
+        }
+
+        function showVerificationMessage(message, isSuccess) {
+            const messageElement = document.getElementById('verification-message');
+            messageElement.textContent = message;
+            messageElement.className = isSuccess ? 'success-message' : 'error-message';
+        }
+
         // Handle verification code input fields
         const codeInputs = document.querySelectorAll('.verification-code input');
         codeInputs.forEach((input, index) => {
@@ -241,42 +325,6 @@
                 }
             });
         });
-
-        function sendVerificationCode() {
-            const email = document.getElementById('email').value;
-            if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-                showVerificationMessage('Please enter a valid email address', false);
-                return;
-            }
-
-            // Generate a random 4-digit code
-            verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            // In a real application, you would send this code via email
-            // For demo purposes, we'll show it in an alert
-            alert(`Your verification code is: ${verificationCode}`);
-            
-            document.getElementById('verification-container').classList.add('active');
-            showVerificationMessage('Verification code sent! Please check your email.', true);
-        }
-
-        function verifyCode() {
-            const enteredCode = Array.from(codeInputs).map(input => input.value).join('');
-            
-            if (enteredCode === verificationCode) {
-                verifiedEmail = document.getElementById('email').value;
-                showVerificationMessage('Email verified successfully!', true);
-                document.getElementById('verification-container').classList.add('verified');
-            } else {
-                showVerificationMessage('Invalid code. Please try again.', false);
-            }
-        }
-
-        function showVerificationMessage(message, isSuccess) {
-            const messageElement = document.getElementById('verification-message');
-            messageElement.textContent = message;
-            messageElement.className = isSuccess ? 'success-message' : 'error-message';
-        }
 
         // Update service dropdown with services from localStorage
         function updateServiceDropdown() {
@@ -404,7 +452,6 @@
             bookingForm.addEventListener('submit', function(event) {
                 event.preventDefault();
                 
-                // Verify that email was verified
                 if (!verifiedEmail) {
                     alert('Please verify your email before submitting the booking.');
                     return;
