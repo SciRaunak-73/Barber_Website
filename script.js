@@ -1,0 +1,28 @@
+// Smooth scrolling for menu links
+document.querySelectorAll("nav ul li a").forEach(link => {
+    link.addEventListener("click", function (event) {
+        let targetId = this.getAttribute("href").substring(1);
+        let targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+            event.preventDefault();
+            targetElement.scrollIntoView({ behavior: "smooth" });
+        }
+    });
+});
+
+window.addEventListener('load', function() {
+    const imageBoxes = document.querySelectorAll('.image-box');
+
+    imageBoxes.forEach(box => {
+        // Remove setTimeout and add 'settled' class immediately
+        box.classList.add('settled');
+    });
+});
+
+const hamburger = document.querySelector(".hamburger");
+const navMenu = document.querySelector(".nav-menu");
+
+hamburger.addEventListener("click", () => {
+  navMenu.classList.toggle("active");
+});

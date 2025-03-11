@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - 3D Swiper</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+    <link rel="stylesheet" href="about.css">
+    <style>
+        /* General Styling */
+        body {
+            background-image: url("images/handsome-man-barbershop-shaving-beard.jpg"); /* Replace with your image path */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        
+        nav{
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            border: 2px solid #ffcc00;
+            border-radius: 5px;
+            
+        }
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background: white;
+            margin: 5px;
+        }
+        .hamburger:hover{
+            background-color: #ffcc00;
+        }
+
+        .hamburger:hover div{
+            background-color: black;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                background: rgba(0, 0, 0, 0.9);
+                text-align: center;
+                padding: 10px 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                top:  10px;
+                left: 10px;
+            }            
+        }
+
+        /* About Section */
+        .about-container {
+            background: rgba(51, 51, 51, 0.8);
+            padding: 40px;
+            width: 80%;
+            max-width: 1000px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0px 0px 15px rgba(255, 165, 0, 0.5);
+            margin-top: 80px;
+            padding-top: 180px;
+        }
+
+        .text-content {
+            width: 50%;
+        }
+
+        .text-content h2 {
+            font-size: 2rem;
+            border-bottom: 3px solid orange;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* Swiper Styles */
+        .swiper-container {
+            width: 40%;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swiper-slide img {
+            width: 80%;
+            border-radius: 10px;
+            transition: transform 1s ease-in-out, opacity 0.7s ease-in-out;
+        }
+
+        .swiper-slide-active img {
+            transform: scale(1.3) rotateY(15deg);
+            opacity: 1;
+        }
+
+        .swiper-slide img:not(.swiper-slide-active img) {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav>
+            <div class="logo">Roy Group</div>
+            <div class="hamburger" onclick="toggleMenu()">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="form.html">Book Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- About Us Section -->
+    <div class="about-container">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="images/beautiful-hispanic-woman-wearing-casual-clothes-looking-positive-happy-standing-smiling-with-confident-smile-showing-teeth.jpg" alt="Image 1"></div>
+                <div class="swiper-slide"><img src="images/enthusiastic-smiling-man-looking-happy-glasses-casual-clothes.jpg" alt="Image 2"></div>
+                <div class="swiper-slide"><img src="images/friendly-handsome-young-bearded-man-posing-with-arms-crossed.jpg" alt="Image 3"></div>
+                <div class="swiper-slide"><img src="images/happy-lifestyle-wellbeing-concept-charming-carefree-smiling-attractive-woman-laughing-out-loud-feeling-lucky-upbeat-having-awesome-vacation-day-off-enjoying-leisure-having-fun.jpg" alt="Image 4"></div>
+                <div class="swiper-slide"><img src="images/happy-man-student-with-afro-hairdo-shows-white-teeth-being-good-mood-after-classes.jpg" alt="Image 5"></div>
+            </div>
+        </div>
+        <div class="text-content">
+            <h2>About Us</h2>
+            <p>At <strong>Maharaja Salon</strong>, we believe that a great haircut is more than just a service, it's an experience.</p>
+            <p>Rooted in traditional barbering techniques, we blend classic artistry with contemporary style to create looks that are as unique as our clients.</p> 
+            <p>Our team of highly skilled barbers brings years of experience and a passion for precision, ensuring every visit leaves you feeling confident and refined.</p>
+            <p>We're dedicated to providing a comfortable and welcoming atmosphere where you can relax and trust in our expertise.</p>
+            <p>From classic cuts and beard trims to modern styling and grooming services, we tailor each treatment to your individual needs.</p>
+            <p>Step into <strong>Maharaja Salon</strong> and discover the difference a truly exceptional barber shop can make.</p>
+        </div>
+    </div>
+
+    <!-- Swiper & JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            coverflowEffect: {
+                rotate: 50,
+                stretch: -50,
+                depth: 300,
+                modifier: 2,
+                slideShadows: true,
+            },
+            loop: true,
+            speed: 700,
+            autoplay: {
+                delay: 2500,
+                disableOnInteraction: false,
+            },
+        });
+
+        function toggleMenu() {
+            const menu = document.querySelector(".nav-links");
+            menu.classList.toggle("active");
+        }
+    </script>
+
+</body>
+</html>

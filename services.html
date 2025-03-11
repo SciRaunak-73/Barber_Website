@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - Barber Shop</title>
+    <link rel="stylesheet" href="services.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            border: 2px solid #ffcc00;
+            border-radius: 5px;
+            
+        }
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background: white;
+            margin: 5px;
+        }
+        .hamburger:hover{
+            background-color: #ffcc00;
+        }
+
+        .hamburger:hover div{
+            background-color: black;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                background: rgba(0, 0, 0, 0.9);
+                text-align: center;
+                padding: 10px 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                top:  10px;
+                left: 10px;
+            }            
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header id="navbar">
+        <nav>
+            <div class="logo">Roy Group</div>
+            <div class="hamburger" onclick="toggleMenu()"> 
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="form.html">Book Now</a></li>
+            </ul>
+        </nav>
+    </header>
+    <header id="normal_heading">
+        <h1>Our Services</h1> 
+        <p>Top-quality grooming services for the modern gentleman.</p>
+
+    </header>
+
+    <section class="services-container">
+        <div class="service-card">
+            <img src="images/client-doing-hair-cut-barber-shop-salon.jpg" alt="Haircut">
+            <h3>Classic Haircut</h3>
+            <p>A stylish and clean haircut tailored to your preference.</p>
+            <p class="price" data-service="Classic Haircut">₹150</p>
+            <a href="form.html" class="book-btn">Book Now</a>
+        </div>
+
+        <div class="service-card">
+            <img src="images/handsome-man-barbershop-shaving-beard (1).jpg" alt="Beard Trim">
+            <h3>Beard Trim</h3>
+            <p>Keep your beard sharp and well-maintained.</p>
+            <p class="price" data-service="Beard Trim">₹100</p>
+            <a href="form.html" class="book-btn">Book Now</a>
+        </div>
+
+        <div class="service-card">
+            <img src="images/mid-section-barber-applying-cream-clients-beard.jpg" alt="Shave">
+            <h3>Luxury Shave</h3>
+            <p>Enjoy a premium shaving experience.</p>
+            <p class="price" data-service="Luxury Shave">₹120</p>
+            <a href="form.html" class="book-btn">Book Now</a>
+        </div>
+        <div class="service-card">
+            <img src="images/traditional-indian-men-clothes-pagri-turban.jpg" alt="groom_makeup">
+            <h3>Groom Makeup</h3>
+            <p>Elevate your moment: Groom makeup for a truly special day.</p>
+            <p class="price" data-service="Groom Makeup">₹8,000</p>
+            <a href="form.html" class="book-btn">Book Now</a>
+        </div>
+    </section>
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector(".nav-links");
+            menu.classList.toggle("active");
+        }
+
+        // Function to update prices from localStorage
+        function updatePrices() {
+            const services = JSON.parse(localStorage.getItem('services')) || [];
+            const priceElements = document.querySelectorAll('.price');
+            
+            priceElements.forEach(element => {
+                const serviceName = element.getAttribute('data-service');
+                const service = services.find(s => s.name === serviceName);
+                if (service) {
+                    element.textContent = `₹${service.price}`;
+                }
+            });
+        }
+
+        // Update prices when page loads
+        document.addEventListener('DOMContentLoaded', updatePrices);
+    </script>
+</body>
+</html>

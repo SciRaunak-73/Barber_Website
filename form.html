@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Now</title>
+    <link rel="stylesheet" href="form.css">
+    <style>
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            border: 2px solid #ffcc00;
+            border-radius: 5px;            
+        }
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background: white;
+            margin: 5px;
+        }
+        .hamburger:hover{
+            background-color: #ffcc00;
+        }
+
+        .hamburger:hover div{
+            background-color: black;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                background: rgba(0, 0, 0, 0.9);
+                text-align: center;
+                padding: 10px 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+            }            
+        }
+
+        /* Email verification styles */
+        .verify-email-btn {
+            background: #ffcc00;
+            color: black;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .verify-email-btn:hover {
+            background: #ff9900;
+        }
+
+        .verification-code-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .verification-code-container.active {
+            display: block;
+        }
+
+        .verification-code {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .verification-code input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #ffcc00;
+            border-radius: 5px;
+            background: transparent;
+            color: white;
+        }
+
+        .verification-code input:focus {
+            outline: none;
+            border-color: #ff9900;
+        }
+
+        #verification-message {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .error-message {
+            color: #ff4444;
+        }
+
+        .success-message {
+            color: #00cc00;
+        }
+
+        .email-group {
+            position: relative;
+        }
+
+        .email-input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .resend-code {
+            color: #ffcc00;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Roy Group</div>
+            <div class="hamburger" onclick="toggleMenu()">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="form.html">Book Now</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div class="form-container">
+        <h2>BOOK NOW</h2>
+        <p>Pre-book Our Service Now And Avoid Waiting Period!!!</p>
+
+        <form id="booking-form">
+            <div class="form-group">
+                <label for="name">Full name:</label>
+                <input type="text" id="name" name="name" placeholder="Write your name here..." required
+                    autocomplete="name">
+            </div>
+
+            <div class="form-group email-group">
+                <label for="email">Email address:</label>
+                <div class="email-input-container">
+                    <input type="email" id="email" name="email" placeholder="Write your email here..." required
+                        autocomplete="email">
+                    <button type="button" onclick="sendVerificationCode()" class="verify-email-btn">Verify Email</button>
+                </div>
+                <div class="verification-code-container" id="verification-container">
+                    <div class="verification-code">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <a class="resend-code" onclick="sendVerificationCode()">Resend Code</a>
+                    </div>
+                    <p id="verification-message"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="service">Select service:</label>
+                <select id="service" name="service" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="time">Time:</label>
+                <select id="time" name="time" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <select id="date" name="date" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone number:</label>
+                <input type="tel" id="phone" name="phone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                    placeholder="Write your number here..." required>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">SUBMIT</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let verificationCode = '';
+        let verifiedEmail = '';
+
+        function toggleMenu() {
+            const menu = document.querySelector(".nav-links");
+            menu.classList.toggle("active");
+        }
+
+        // Handle verification code input fields
+        const codeInputs = document.querySelectorAll('.verification-code input');
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key >= 0 && e.key <= 9) {
+                    if (index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    } else {
+                        // If we're on the last input and a number was entered, verify the code
+                        const enteredCode = Array.from(codeInputs).map(input => input.value).join('');
+                        if (enteredCode.length === 4) {
+                            verifyCode();
+                        }
+                    }
+                } else if (e.key === 'Backspace') {
+                    if (index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                }
+            });
+        });
+
+        function sendVerificationCode() {
+            const email = document.getElementById('email').value;
+            if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                showVerificationMessage('Please enter a valid email address', false);
+                return;
+            }
+
+            // Generate a random 4-digit code
+            verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            // In a real application, you would send this code via email
+            // For demo purposes, we'll show it in an alert
+            alert(`Your verification code is: ${verificationCode}`);
+            
+            document.getElementById('verification-container').classList.add('active');
+            showVerificationMessage('Verification code sent! Please check your email.', true);
+        }
+
+        function verifyCode() {
+            const enteredCode = Array.from(codeInputs).map(input => input.value).join('');
+            
+            if (enteredCode === verificationCode) {
+                verifiedEmail = document.getElementById('email').value;
+                showVerificationMessage('Email verified successfully!', true);
+                document.getElementById('verification-container').classList.add('verified');
+            } else {
+                showVerificationMessage('Invalid code. Please try again.', false);
+            }
+        }
+
+        function showVerificationMessage(message, isSuccess) {
+            const messageElement = document.getElementById('verification-message');
+            messageElement.textContent = message;
+            messageElement.className = isSuccess ? 'success-message' : 'error-message';
+        }
+
+        // Update service dropdown with services from localStorage
+        function updateServiceDropdown() {
+            const serviceSelect = document.getElementById('service');
+            const defaultServices = [
+                { name: 'Classic Haircut', price: 150 },
+                { name: 'Beard Trim', price: 100 },
+                { name: 'Luxury Shave', price: 120 },
+                { name: 'Groom Makeup', price: 8000 }
+            ];
+
+            // Initialize services in localStorage if not present
+            if (!localStorage.getItem('services')) {
+                localStorage.setItem('services', JSON.stringify(defaultServices));
+            }
+
+            const services = JSON.parse(localStorage.getItem('services'));
+
+            // Clear existing options
+            serviceSelect.innerHTML = '<option value="" disabled selected>Select a service</option>';
+
+            // Add all services
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.name;
+                option.textContent = `${service.name} - ₹${service.price}`;
+                serviceSelect.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Update service dropdown
+            updateServiceDropdown();
+
+            // Add event listener to refresh services every minute
+            setInterval(updateServiceDropdown, 60000);
+
+            // Date input: Populate the dropdown with today and tomorrow
+            const dateSelect = document.getElementById('date');
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${day}-${month}-${year}`;
+            };
+
+            const todayOption = document.createElement('option');
+            todayOption.value = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
+            todayOption.textContent = formatDate(today);
+            dateSelect.appendChild(todayOption);
+
+            const tomorrowOption = document.createElement('option');
+            tomorrowOption.value = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate()).toISOString().split('T')[0];
+            tomorrowOption.textContent = formatDate(tomorrow);
+            dateSelect.appendChild(tomorrowOption);
+
+            // Time input: Populate the dropdown with 15-minute intervals
+            const timeSelect = document.getElementById('time');
+            const startTime = new Date();
+            startTime.setHours(9, 0, 0); // 9:00 AM
+
+            const endTime = new Date();
+            endTime.setHours(20, 0, 0); // 8:00 PM
+
+            // Get existing bookings for the selected date
+            function getBookedTimesForDate(selectedDate) {
+                const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+                return bookings
+                    .filter(booking => booking.date === selectedDate && booking.status !== 'cancelled')
+                    .map(booking => booking.time);
+            }
+
+            function updateTimeSlots() {
+                const selectedDate = dateSelect.value;
+                const bookedTimes = getBookedTimesForDate(selectedDate);
+                
+                // Clear existing options
+                timeSelect.innerHTML = '<option value="" disabled selected>Select a time slot</option>';
+                
+                let currentTime = new Date(startTime);
+
+                while (currentTime < endTime) {
+                    const startHours = currentTime.getHours().toString().padStart(2, '0');
+                    const startMinutes = currentTime.getMinutes().toString().padStart(2, '0');
+                    const startTimeString = `${startHours}:${startMinutes}`;
+
+                    const nextTime = new Date(currentTime);
+                    nextTime.setMinutes(currentTime.getMinutes() + 15);
+
+                    const endHours = nextTime.getHours().toString().padStart(2, '0');
+                    const endMinutes = nextTime.getMinutes().toString().padStart(2, '0');
+                    const endTimeString = `${endHours}:${endMinutes}`;
+
+                    const timeSlotString = `${startTimeString}-${endTimeString}`;
+                    
+                    const option = document.createElement('option');
+                    option.value = startTimeString;
+                    option.textContent = timeSlotString;
+                    
+                    // Check if this time slot is booked
+                    if (bookedTimes.includes(startTimeString)) {
+                        option.disabled = true;
+                        option.style.backgroundColor = '#e0e0e0';
+                        option.style.color = '#666';
+                        option.textContent += ' (Booked)';
+                    }
+                    
+                    timeSelect.appendChild(option);
+                    currentTime = nextTime;
+                }
+            }
+
+            // Add event listener to date input to update time slots
+            dateSelect.addEventListener('change', updateTimeSlots);
+
+            // Initial update of time slots
+            updateTimeSlots();
+
+            // Handle form submission
+            const bookingForm = document.getElementById('booking-form');
+            bookingForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Verify that email was verified
+                if (!verifiedEmail) {
+                    alert('Please verify your email before submitting the booking.');
+                    return;
+                }
+
+                // Get form data
+                const name = document.getElementById('name').value;
+                const service = document.getElementById('service').value;
+                const time = document.getElementById('time').value;
+                const date = document.getElementById('date').value;
+                const phone = document.getElementById('phone').value;
+                
+                // Create booking object
+                const booking = {
+                    id: Date.now(),
+                    name,
+                    email: verifiedEmail,
+                    service,
+                    time,
+                    date,
+                    phone,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    emailVerified: true
+                };
+                
+                // Get existing bookings from localStorage or initialize empty array
+                const existingBookings = JSON.parse(localStorage.getItem('bookings')) || [];
+                
+                // Add new booking
+                existingBookings.push(booking);
+                
+                // Save back to localStorage
+                localStorage.setItem('bookings', JSON.stringify(existingBookings));
+                
+                // Show success message
+                alert('Booking submitted successfully! We will contact you shortly.');
+                
+                // Reset form and verification state
+                bookingForm.reset();
+                verifiedEmail = '';
+                verificationCode = '';
+                document.getElementById('verification-container').classList.remove('active', 'verified');
+                Array.from(codeInputs).forEach(input => input.value = '');
+                document.getElementById('verification-message').textContent = '';
+            });
+        });
+    </script>
+    <footer>
+        <p>Note : A reservation fee of ₹200 is required to book your seat. Please arrive 5 minutes before your booked time to avoid delays. Thank you!</p>
+    </footer>    
+</body>
+
+</html>
