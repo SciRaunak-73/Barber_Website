@@ -337,6 +337,12 @@
                 reply_to: email
             };
 
+            console.log('Attempting to send email with params:', {
+                serviceId: 'service_3wlgfnk',
+                templateId: 'template_k5u3nji',
+                templateParams: templateParams
+            });
+
             showVerificationMessage('Sending verification code...', true);
 
             emailjs.send('service_3wlgfnk', 'template_k5u3nji', templateParams)
@@ -345,7 +351,9 @@
                     showVerificationMessage('Verification code sent! Please check your email (including spam folder).', true);
                 })
                 .catch(function(error) {
-                    console.error('Email send failed:', error);
+                    console.error('Email send failed. Full error:', error);
+                    console.error('Error status:', error.status);
+                    console.error('Error text:', error.text);
                     clearInterval(countdownInterval);
                     resendButton.textContent = 'Resend Code';
                     resendButton.style.opacity = '1';
