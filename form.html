@@ -19,6 +19,7 @@
                 console.log("EmailJS initialized successfully");
             } catch (error) {
                 console.error("EmailJS initialization error:", error);
+                showVerificationMessage('Error initializing email service. Please try again later.', false);
             }
         })();
     </script>
@@ -349,7 +350,11 @@
                     resendButton.textContent = 'Resend Code';
                     resendButton.style.opacity = '1';
                     resendButton.style.pointerEvents = 'auto';
-                    showVerificationMessage('Failed to send verification code. Please try again.', false);
+                    if (error.text) {
+                        showVerificationMessage('Failed to send email: ' + error.text, false);
+                    } else {
+                        showVerificationMessage('Failed to send verification code. Please check your internet connection and try again.', false);
+                    }
                 });
         }
 
