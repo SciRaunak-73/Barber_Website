@@ -11,11 +11,7 @@
     <script type="text/javascript">
         (function() {
             try {
-                emailjs.init({
-                    publicKey: "yBP8NKjJ7HmY9gAXP",
-                    blockHeadless: false,
-                    limitRate: true
-                });
+                emailjs.init("yBP8NKjJ7HmY9gAXP");
                 console.log("EmailJS initialized successfully");
             } catch (error) {
                 console.error("EmailJS initialization error:", error);
