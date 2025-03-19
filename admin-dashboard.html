@@ -293,6 +293,7 @@
                     <th>Date & Time</th>
                     <th>Customer Name</th>
                     <th>Service</th>
+                    <th>Price (₹)</th>
                     <th>Contact</th>
                     <th>Email</th>
                     <th>Status</th>
@@ -356,10 +357,15 @@
                 const [year, month, day] = booking.date.split('-');
                 const displayDate = `${day}-${month}-${year}`;
                 
+                // Get service price
+                const services = JSON.parse(localStorage.getItem('services')) || [];
+                const servicePrice = services.find(s => s.name === booking.service)?.price || 'N/A';
+                
                 row.innerHTML = `
                     <td>${displayDate} ${booking.time}</td>
                     <td>${booking.name}</td>
                     <td>${booking.service}</td>
+                    <td>₹${servicePrice}</td>
                     <td>${booking.phone}</td>
                     <td>${booking.email || 'N/A'}</td>
                     <td>${booking.status}</td>
@@ -478,6 +484,10 @@
                 const [year, month, day] = booking.date.split('-');
                 const displayDate = `${day}-${month}-${year}`;
                 
+                // Get service price
+                const services = JSON.parse(localStorage.getItem('services')) || [];
+                const servicePrice = services.find(s => s.name === booking.service)?.price || 'N/A';
+                
                 return {
                     'Booking ID': booking.id,
                     'Date': displayDate,
@@ -486,6 +496,7 @@
                     'Email': booking.email || 'N/A',
                     'Phone': booking.phone,
                     'Service': booking.service,
+                    'Price (₹)': servicePrice,
                     'Status': booking.status,
                     'Created At': new Date(booking.createdAt).toLocaleString()
                 };
