@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Maharaja Salon</title>
+    <!-- Add SheetJS library -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -198,6 +200,27 @@
             background-color: #218838;
         }
 
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        .download-btn i {
+            font-size: 18px;
+        }
+
         @media (max-width: 768px) {
             .statistics {
                 grid-template-columns: 1fr;
@@ -209,6 +232,8 @@
             }
         }
     </style>
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -258,6 +283,10 @@
         </div>
 
         <h2 style="color: #ffcc00; margin-bottom: 20px;">Recent Bookings</h2>
+        <button class="download-btn" onclick="downloadBookings()">
+            <i class="fas fa-download"></i>
+            Download Bookings
+        </button>
         <table class="bookings-table">
             <thead>
                 <tr>
@@ -265,6 +294,7 @@
                     <th>Customer Name</th>
                     <th>Service</th>
                     <th>Contact</th>
+                    <th>Email</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -331,6 +361,7 @@
                     <td>${booking.name}</td>
                     <td>${booking.service}</td>
                     <td>${booking.phone}</td>
+                    <td>${booking.email || 'N/A'}</td>
                     <td>${booking.status}</td>
                     <td>
                         ${booking.status === 'pending' ? 
@@ -435,6 +466,44 @@
         function logout() {
             localStorage.removeItem('adminLoggedIn');
             window.location.href = 'admin-login.html';
+        }
+
+        // Function to download bookings as Excel file
+        function downloadBookings() {
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            
+            // Transform bookings data for Excel
+            const excelData = bookings.map(booking => {
+                // Format the date (YYYY-MM-DD to DD-MM-YYYY)
+                const [year, month, day] = booking.date.split('-');
+                const displayDate = `${day}-${month}-${year}`;
+                
+                return {
+                    'Booking ID': booking.id,
+                    'Date': displayDate,
+                    'Time': booking.time,
+                    'Customer Name': booking.name,
+                    'Email': booking.email || 'N/A',
+                    'Phone': booking.phone,
+                    'Service': booking.service,
+                    'Status': booking.status,
+                    'Created At': new Date(booking.createdAt).toLocaleString()
+                };
+            });
+
+            // Create worksheet
+            const ws = XLSX.utils.json_to_sheet(excelData);
+
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Bookings");
+
+            // Get current date for filename
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+
+            // Save the file
+            XLSX.writeFile(wb, `Bookings_${dateStr}.xlsx`);
         }
 
         // Initialize dashboard
