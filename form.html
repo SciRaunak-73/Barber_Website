@@ -13,8 +13,8 @@
             try {
                 emailjs.init({
                     publicKey: "yBP8NKjJ7HmY9gAXP",
-                    blockHeadless: false, // Optional: prevent usage in NodeJS environment
-                    limitRate: true // Optional: prevent spam
+                    blockHeadless: false,
+                    limitRate: true
                 });
                 console.log("EmailJS initialized successfully");
             } catch (error) {
@@ -329,15 +329,26 @@
             // Send verification email using EmailJS
             const templateParams = {
                 to_email: email,
-                verification_code: verificationCode
+                verification_code: verificationCode,
+                to_name: document.getElementById('name').value || 'Customer',
+                from_name: 'Roy Group Salon',
+                message: `Your verification code is: ${verificationCode}`,
+                reply_to: email
             };
 
-            emailjs.send('service_aqzgkyl', 'template_yvw0bqj', templateParams)
+            showVerificationMessage('Sending verification code...', true);
+
+            emailjs.send('service_3wlgfnk', 'template_k5u3nji', templateParams)
                 .then(function(response) {
                     console.log('Email sent successfully:', response);
-                    showVerificationMessage('Verification code sent! Please check your email.', true);
-                }, function(error) {
+                    showVerificationMessage('Verification code sent! Please check your email (including spam folder).', true);
+                })
+                .catch(function(error) {
                     console.error('Email send failed:', error);
+                    clearInterval(countdownInterval);
+                    resendButton.textContent = 'Resend Code';
+                    resendButton.style.opacity = '1';
+                    resendButton.style.pointerEvents = 'auto';
                     showVerificationMessage('Failed to send verification code. Please try again.', false);
                 });
         }
