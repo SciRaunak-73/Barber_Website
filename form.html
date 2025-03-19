@@ -605,7 +605,7 @@
                     localStorage.setItem('bookings', JSON.stringify(existingBookings));
                     console.log('Booking saved successfully');
                     
-                    // Show success message
+                    // Show success message and redirect
                     alert('Booking submitted successfully! We will contact you shortly.');
                     
                     // Reset form and verification state
@@ -615,6 +615,9 @@
                     document.getElementById('verification-container').classList.remove('active', 'verified');
                     Array.from(codeInputs).forEach(input => input.value = '');
                     document.getElementById('verification-message').textContent = '';
+
+                    // Redirect to services page
+                    window.location.href = 'services.html';
                 } catch (error) {
                     console.error('Error saving booking:', error);
                     alert('There was an error saving your booking. Please try again.');
